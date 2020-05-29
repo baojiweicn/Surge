@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 // Author : baojiwei@live.com.
 
-package bus
+package core
 
 import (
 	"context"
@@ -115,8 +115,16 @@ func (t *Topic) Delete(watcher Watcher) {
 // Select releated message from topic and send them to wathers.
 type EventBus struct {
 	lock   *sync.RWMutex
-	ticker time.Ticker
+	ticker *time.Ticker
 	topics map[string]*Topic
+}
+
+func NewEventBus(duration time.Duration) *EventBus {
+	return &EventBus{
+		lock:   &sync.RWMutex{},
+		ticker: time.NewTicker(duration),
+		topics: make(map[string]*Topic),
+	}
 }
 
 // GetOrCreateTopic : get or add topic to event bus
@@ -165,12 +173,17 @@ func (e *EventBus) Send(msg *Message) {
 }
 
 // Start : start event bus
-func (e *EventBus) Start() {
-	for range e.ticker.C {
-		e.lock.RLock()
-		for _, topic := range e.topics {
-			go topic.fire()
+func (e *EventBus) Start(ctx context.Context) {
+	for {
+		select {
+		case <-e.ticker.C:
+			e.lock.RLock()
+			for _, topic := range e.topics {
+				go topic.fire()
+			}
+			e.lock.RUnlock()
+		case <-ctx.Done():
+			return
 		}
-		e.lock.RUnlock()
 	}
 }
