@@ -23,7 +23,7 @@ type Message struct {
 }
 
 // NewMessage : create new message.
-func NewMessgae(topic string, ctx context.Context) *Message {
+func NewMessage(topic string, ctx context.Context) *Message {
 	return &Message{
 		topic:     topic,
 		ctx:       ctx,
@@ -129,7 +129,7 @@ func NewEventBus(duration time.Duration) *EventBus {
 
 // GetOrCreateTopic : get or add topic to event bus
 func (e *EventBus) GetOrCreateTopic(name string) *Topic {
-	if topic, err := e.GetTopic(name); err != nil {
+	if topic, err := e.GetTopic(name); err == nil {
 		return topic
 	} else {
 		topic := NewTopic(name)
