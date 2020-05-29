@@ -3,6 +3,18 @@
 // license that can be found in the LICENSE file.
 // Author : baojiwei@live.com.
 
+/*
+event_bus.go
+- EventBus: exchange messages to subscribers.
+- example:
+ 		bus := NewEventBus(DefaultTickDuration)
+		ctx, cancel := context.WithCancel(context.Background())
+		go bus.Start(ctx)
+		bus.GetOrCreateTopic("test").Add(watcher)
+		bus.Send(NewMessage("test", context.WithValue(context.Background(), "hello", "world")))
+		cancel()
+*/
+
 package core
 
 import (
