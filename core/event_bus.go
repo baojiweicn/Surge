@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 // Author : baojiwei@live.com.
+package core
 
 /*
 event_bus.go
@@ -14,8 +15,6 @@ event_bus.go
 		bus.Send(NewMessage("test", context.WithValue(context.Background(), "hello", "world")))
 		cancel()
 */
-
-package core
 
 import (
 	"context"
