@@ -13,14 +13,14 @@ type Manager interface {
 	Update(string) error  // update all required source.
 }
 
-// Package : is the struct for a new packag
+// Package : is the struct for a new package
 type Package struct {
 	manager Manager
 	Name    string
 	Version string
 }
 
-// NewPackage : Create new Package
+// NewPackage : create new Package
 func NewPackage(manager Manager, name, version string) *Package {
 	return &Package{
 		manager: manager,

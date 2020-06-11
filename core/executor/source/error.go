@@ -5,6 +5,8 @@ import (
 )
 
 var (
+	// SourceError : error happened in source manager
+	SourceError = errors.NewError("environment {{language}} package manager error {{error}}")
 	// SourceNotExistsError : is the error for package manager not founc
 	SourceNotExistsError = errors.NewError("environment {{language}} package manager not exists")
 	// PackageNotInstalledError : is the error for the package not installed

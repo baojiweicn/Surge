@@ -17,55 +17,80 @@ type PythonManager struct {
 	path string
 }
 
+// NewPythonManager : create new python manager
 func NewPythonManager(path string) *PythonManager {
 	return &PythonManager{
 		path: path,
 	}
 }
 
+// Path : get python manager path
 func (m *PythonManager) Path() string {
 	return m.path
 }
 
-func (m *PythonManager) Check(pack *Package) error {
-	packs := make([]*Package, 0)
-	err := json.Unmarshal([]byte(CheckInstalledCommand.Render([]parser.Field{
-		parser.F("pip", m.Path()),
-	})), packs)
+// Get : get the package
+func (m *PythonManager) Get(pack *Package) (*Package, error) {
+	packs, err := m.GetAll()
 	if err != nil {
-		return PackageNotInstalledError.Raise(
-			[]errors.Field{
-				errors.F("package", pack.Name),
-			},
-		)
-	} else {
-		for _, p := range packs {
-			if p.Name == pack.Name {
-				if p.Version == pack.Version {
-					return nil
-				} else {
-					return PackageVersionNotMatchError.Raise(
-						[]errors.Field{
-							errors.F("package", pack.Name),
-							errors.F("current", p.Version),
-							errors.F("want", pack.Version),
-						},
-					)
-				}
-			}
+		return nil, err
+	}
+	for _, p := range packs {
+		if p.Name == pack.Name {
+			return p, nil
 		}
 	}
-	return PackageNotInstalledError.Raise(
+	return nil, PackageNotInstalledError.Raise(
 		[]errors.Field{
 			errors.F("package", pack.Name),
 		},
 	)
 }
 
+// GetAll : get all packages
+func (m *PythonManager) GetAll() ([]*Package, error) {
+	packs := make([]*Package, 0)
+	err := json.Unmarshal([]byte(CheckInstalledCommand.Render([]parser.Field{
+		parser.F("pip", m.Path()),
+	})), packs)
+	if err != nil {
+		return packs, SourceError.Raise(
+			[]errors.Field{
+				errors.F("language", "python"),
+				errors.F("error", err.Error()),
+			},
+		)
+	}
+	return packs, nil
+}
+
+// Check : check the package is exist
+func (m *PythonManager) Check(pack *Package) error {
+	// get the package
+	p, err := m.Get(pack)
+	if err != nil {
+		return err
+	}
+	// if version match return without error
+	if p.Version == pack.Version {
+		return nil
+	}
+	// if version not match, return error
+	return PackageVersionNotMatchError.Raise(
+		[]errors.Field{
+			errors.F("package", pack.Name),
+			errors.F("current", p.Version),
+			errors.F("want", pack.Version),
+		},
+	)
+}
+
+// Install : install the package
 func (m *PythonManager) Install(pack *Package) error {
 	return nil
 }
 
+// Update : update the package
 func (m *PythonManager) Update(pack *Package) error {
 	return nil
 }
