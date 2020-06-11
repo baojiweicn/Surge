@@ -1,5 +1,9 @@
 package executor
 
+import (
+	"github.com/baojiweicn/Surge/core/executor/source"
+)
+
 type EnvType uint16
 
 var (
@@ -13,13 +17,5 @@ var (
 // Environment : is the control of language source manager.
 type Environment struct {
 	envType EnvType
-	manager SourceManager
-}
-
-// SourceManager : is the interface of manager of language required source.
-type SourceManager interface {
-	Path() string
-	Check(string) error   // Check if required source is all installed.
-	Install(string) error // Install all required source.
-	Update(string) error  // Update all required source.
+	manager source.SourceManager
 }
