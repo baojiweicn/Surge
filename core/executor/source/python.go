@@ -1,7 +1,11 @@
 package source
 
 import (
+	"bytes"
 	"encoding/json"
+	"strings"
+
+	"os/exec"
 
 	"github.com/baojiweicn/Surge/util/errors"
 	"github.com/baojiweicn/Surge/util/parser"
@@ -9,7 +13,7 @@ import (
 
 var (
 	// CheckInstalledCommand is to get package installed and get the version
-	CheckInstalledCommand = parser.NewTemplate("{{pip}} list --format json")
+	CheckInstalledCommand = NewCommand("--disable-pip-version-check", "list", "--format", "json")
 )
 
 // PythonManager : is the python package source manager -> pip
@@ -22,6 +26,19 @@ func NewPythonManager(path string) *PythonManager {
 	return &PythonManager{
 		path: path,
 	}
+}
+
+// GetDefaultPythonManager : get default python manager
+func GetDefaultPythonManager() *PythonManager {
+	cmd := exec.Command("which", "pip")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	if err := cmd.Run(); err != nil {
+		return nil
+	}
+
+	path := strings.Replace(out.String(), "\n", "", -1)
+	return &PythonManager{path: path}
 }
 
 // Path : get python manager path
@@ -50,10 +67,19 @@ func (m *PythonManager) Get(pack *Package) (*Package, error) {
 // GetAll : get all packages
 func (m *PythonManager) GetAll() ([]*Package, error) {
 	packs := make([]*Package, 0)
-	err := json.Unmarshal([]byte(CheckInstalledCommand.Render([]parser.Field{
+	cmd := exec.Command(m.Path(), CheckInstalledCommand.Render([]parser.Field{
 		parser.F("pip", m.Path()),
-	})), packs)
+	})...)
+	out, err := cmd.CombinedOutput()
 	if err != nil {
+		return packs, SourceError.Raise(
+			[]errors.Field{
+				errors.F("language", "python"),
+				errors.F("error", err.Error()),
+			},
+		)
+	}
+	if err := json.Unmarshal(out, packs); err != nil {
 		return packs, SourceError.Raise(
 			[]errors.Field{
 				errors.F("language", "python"),
