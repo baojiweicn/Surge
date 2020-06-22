@@ -3,8 +3,8 @@ package util_test
 import (
 	"testing"
 
-	util "github.com/baojiwei/Surge/util/util"
 	tutil "github.com/baojiweicn/Surge/util/testutil"
+	util "github.com/baojiweicn/Surge/util/util"
 )
 
 type Duck interface {
