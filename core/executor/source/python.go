@@ -16,7 +16,11 @@ var (
 	// CheckInstalledCommand is to get package installed and get the version
 	CheckInstalledCommand = NewCommand("--disable-pip-version-check", "list", "--format", "json")
 	// InstallPackageCommand is to install package
-	InstallPackageCommand = NewCommand("{{name}}", "==", "{{version}}")
+	InstallPackageCommand = NewCommand("install", "{{name}}", "==", "{{version}}")
+	// InstallPackageWithoutVersionCommand is to install package without version
+	InstallPackageWithoutVersionCommand = NewCommand("install", "{{name}}")
+	// UninstallPackageCommand is to uninstall package
+	UninstallPackageCommand = NewCommand("uninstall", "{{name}}")
 )
 
 // PythonManager : is the python package source manager -> pip
@@ -125,10 +129,17 @@ func (m *PythonManager) Check(pack *Package) error {
 
 // Install : install the package
 func (m *PythonManager) Install(pack *Package) error {
-	cmd := exec.Command(m.Path(), InstallPackageCommand.Render([]parser.Field{
-		parser.F("name", pack.Name),
-		parser.F("version", pack.Version),
-	})...)
+	var cmd *exec.Cmd
+	if len(pack.Version) != 0 {
+		cmd = exec.Command(m.Path(), InstallPackageCommand.Render([]parser.Field{
+			parser.F("name", pack.Name),
+			parser.F("version", pack.Version),
+		})...)
+	} else {
+		cmd = exec.Command(m.Path(), InstallPackageWithoutVersionCommand.Render([]parser.Field{
+			parser.F("name", pack.Name),
+		})...)
+	}
 
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return PackageInstallError.Raise(
@@ -141,6 +152,22 @@ func (m *PythonManager) Install(pack *Package) error {
 		)
 	}
 
+	return nil
+}
+
+func (m *PythonManager) Uninstall(pack *Package) error {
+	cmd := exec.Command(m.Path(), UninstallPackageCommand.Render([]parser.Field{
+		parser.F("name", pack.Name),
+	})...)
+	if _, err := cmd.CombinedOutput(); err != nil {
+		return PackageUninstallError.Raise(
+			[]errors.Field{
+				errors.F("language", "python"),
+				errors.F("package", pack.Name),
+				errors.F("error", err.Error()),
+			},
+		)
+	}
 	return nil
 }
 

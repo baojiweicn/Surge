@@ -29,3 +29,17 @@ func Test_PythonManageGetAll(t *testing.T) {
 	}
 
 }
+
+func Test_PythonManageInstall(t *testing.T) {
+	manager := GetDefaultPythonManager()
+	pack := &Package{
+		Name: "requests",
+	}
+	defer manager.Uninstall(pack)
+	if manager != nil {
+		t.Logf(manager.Path())
+		if err := manager.Install(pack); err != nil {
+			t.Error(err)
+		}
+	}
+}
