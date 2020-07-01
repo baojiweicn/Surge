@@ -175,7 +175,3 @@ func (m *PythonManager) Uninstall(pack *Package) error {
 func (m *PythonManager) Update(pack *Package) error {
 	return m.Install(pack)
 }
-
-func (m *PythonManager) Packages() []string {
-	return make([]string, 0)
-}
