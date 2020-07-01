@@ -17,5 +17,5 @@ var (
 // Environment : is the control of language source manager.
 type Environment struct {
 	envType EnvType
-	manager source.SourceManager
+	manager source.Manager
 }

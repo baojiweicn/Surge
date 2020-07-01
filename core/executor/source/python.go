@@ -3,6 +3,7 @@ package source
 import (
 	"bytes"
 	"encoding/json"
+	"regexp"
 	"strings"
 
 	"os/exec"
@@ -79,7 +80,16 @@ func (m *PythonManager) GetAll() ([]*Package, error) {
 			},
 		)
 	}
-	if err := json.Unmarshal(out, packs); err != nil {
+	if match, err := regexp.Match(`\[.*\]`, out); err != nil || !match {
+		return packs, SourceError.Raise(
+			[]errors.Field{
+				errors.F("language", "python"),
+				errors.F("error", err.Error()),
+			},
+		)
+	}
+	reg, _ := regexp.Compile(`\[.*\]`)
+	if err := json.Unmarshal(reg.Find(out), &packs); err != nil {
 		return packs, SourceError.Raise(
 			[]errors.Field{
 				errors.F("language", "python"),
