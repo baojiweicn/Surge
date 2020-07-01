@@ -15,6 +15,8 @@ import (
 var (
 	// CheckInstalledCommand is to get package installed and get the version
 	CheckInstalledCommand = NewCommand("--disable-pip-version-check", "list", "--format", "json")
+	// InstallPackageCommand is to install package
+	InstallPackageCommand = NewCommand("{{name}}", "==", "{{version}}")
 )
 
 // PythonManager : is the python package source manager -> pip
@@ -123,12 +125,28 @@ func (m *PythonManager) Check(pack *Package) error {
 
 // Install : install the package
 func (m *PythonManager) Install(pack *Package) error {
+	cmd := exec.Command(m.Path(), InstallPackageCommand.Render([]parser.Field{
+		parser.F("name", pack.Name),
+		parser.F("version", pack.Version),
+	})...)
+
+	if _, err := cmd.CombinedOutput(); err != nil {
+		return PackageInstallError.Raise(
+			[]errors.Field{
+				errors.F("language", "python"),
+				errors.F("package", pack.Name),
+				errors.F("version", pack.Version),
+				errors.F("error", err.Error()),
+			},
+		)
+	}
+
 	return nil
 }
 
 // Update : update the package
 func (m *PythonManager) Update(pack *Package) error {
-	return nil
+	return m.Install(pack)
 }
 
 func (m *PythonManager) Packages() []string {

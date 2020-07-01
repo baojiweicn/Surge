@@ -14,4 +14,6 @@ var (
 
 	// PackageVersionNotMatchError : the package installed but the version not match
 	PackageVersionNotMatchError = errors.NewError("{{package}} current version {{current}} but want {{want}}")
+	// PackageInstallError : the package install failed
+	PackageInstallError = errors.NewError("environment {{language}} install {{package}} : {{version}} error {{error}}")
 )
