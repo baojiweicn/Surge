@@ -19,6 +19,7 @@ var (
 	LangRuby             = 5
 )
 
+// Executor : is the exector for a language command executor
 type Executor struct {
 	langType LangType
 	env      *Environment
