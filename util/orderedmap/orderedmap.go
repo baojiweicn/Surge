@@ -1,3 +1,9 @@
+// Copyright 2020 Surge Project. rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+// Author : baojiwei@live.com.
+package orderedmap
+
 // Package orderedmap implements an ordered map.
 //
 // Example
@@ -15,7 +21,6 @@
 //		val, ok := m.Get(key)
 //	}
 //
-package orderedmap
 
 // OrderedMap is an ordered map with strings as keys.
 type OrderedMap struct {
