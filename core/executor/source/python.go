@@ -8,19 +8,20 @@ import (
 
 	"os/exec"
 
+	"github.com/baojiweicn/Surge/core/command"
 	"github.com/baojiweicn/Surge/util/errors"
 	"github.com/baojiweicn/Surge/util/parser"
 )
 
 var (
 	// CheckInstalledCommand is to get package installed and get the version
-	CheckInstalledCommand = NewCommand("--disable-pip-version-check", "list", "--format", "json")
+	CheckInstalledCommand = command.NewCommandTemplate("--disable-pip-version-check", "list", "--format", "json")
 	// InstallPackageCommand is to install package
-	InstallPackageCommand = NewCommand("install", "{{name}}", "==", "{{version}}")
+	InstallPackageCommand = command.NewCommandTemplate("install", "{{name}}", "==", "{{version}}")
 	// InstallPackageWithoutVersionCommand is to install package without version
-	InstallPackageWithoutVersionCommand = NewCommand("install", "{{name}}")
+	InstallPackageWithoutVersionCommand = command.NewCommandTemplate("install", "{{name}}")
 	// UninstallPackageCommand is to uninstall package
-	UninstallPackageCommand = NewCommand("uninstall", "{{name}}")
+	UninstallPackageCommand = command.NewCommandTemplate("uninstall", "{{name}}")
 )
 
 // PythonManager : is the python package source manager -> pip
@@ -74,9 +75,9 @@ func (m *PythonManager) Get(pack *Package) (*Package, error) {
 // GetAll : get all packages
 func (m *PythonManager) GetAll() ([]*Package, error) {
 	packs := make([]*Package, 0)
-	cmd := exec.Command(m.Path(), CheckInstalledCommand.Render([]parser.Field{
+	cmd := CheckInstalledCommand.SetExecutor(m.Path()).Generate([]parser.Field{
 		parser.F("pip", m.Path()),
-	})...)
+	})
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return packs, SourceError.Raise(
@@ -131,14 +132,14 @@ func (m *PythonManager) Check(pack *Package) error {
 func (m *PythonManager) Install(pack *Package) error {
 	var cmd *exec.Cmd
 	if len(pack.Version) != 0 {
-		cmd = exec.Command(m.Path(), InstallPackageCommand.Render([]parser.Field{
+		cmd = InstallPackageCommand.SetExecutor(m.Path()).Generate([]parser.Field{
 			parser.F("name", pack.Name),
 			parser.F("version", pack.Version),
-		})...)
+		})
 	} else {
-		cmd = exec.Command(m.Path(), InstallPackageWithoutVersionCommand.Render([]parser.Field{
+		cmd = InstallPackageWithoutVersionCommand.SetExecutor(m.Path()).Generate([]parser.Field{
 			parser.F("name", pack.Name),
-		})...)
+		})
 	}
 
 	if _, err := cmd.CombinedOutput(); err != nil {
@@ -156,9 +157,9 @@ func (m *PythonManager) Install(pack *Package) error {
 }
 
 func (m *PythonManager) Uninstall(pack *Package) error {
-	cmd := exec.Command(m.Path(), UninstallPackageCommand.Render([]parser.Field{
+	cmd := UninstallPackageCommand.SetExecutor(m.Path()).Generate([]parser.Field{
 		parser.F("name", pack.Name),
-	})...)
+	})
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return PackageUninstallError.Raise(
 			[]errors.Field{
