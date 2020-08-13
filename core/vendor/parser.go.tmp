@@ -1,0 +1,22 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	"github.com/baojiweicn/Surge/core/vendor/device"
+	"gopkg.in/yaml.v2"
+)
+
+func main() {
+	f, err := os.OpenFile("../../addones/xiaomi/vaccum/vaccum.yml", os.O_RDONLY, 0600)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	readByte, err := ioutil.ReadAll(f)
+	t := make(device.Config)
+	yaml.Unmarshal(readByte, t)
+	fmt.Printf("%+v", t)
+}

@@ -1,0 +1,71 @@
+package vendor
+
+import (
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
+
+	"gopkg.in/yaml.v2"
+)
+
+var addonesPath = "../../addones/"
+
+type Config struct {
+	config map[interface{}]interface{}
+}
+
+func (c *Config) Load(p string) {
+	if ok := strings.Contains(p, ".yml"); !ok {
+		return
+	}
+	f, err := os.OpenFile(path.Join(addonsPath, p), os.O_RDONLY, 0600)
+	defer f.Close()
+	readByte, err := ioutil.ReadAll(f)
+	c.config = make(map[interface{}]interface{})
+	yaml.Unmarshal(readByte, c.config)
+}
+
+func (c *Config) Device() *Device {}
+
+func (c *Config) Actions() []*Actions {}
+
+func (c *Config) Messages() []*Messages {}
+
+type Device struct {
+	config *Config
+}
+
+type Device struct {
+	Name        string `yaml:"name,omitempty"`
+	Environment string
+	Types       []string
+	Tags        []string
+	Infos       []Info
+	Storage     map[string]interface{}
+}
+
+func (d *Device) Init(config *Config) {
+	d.config = config
+	if value, ok := d.config["device"]; !ok {
+		return
+	} else {
+		for k, v := range value {
+			switch k {
+			case "name":
+				d.Name = v
+			case "environment":
+				d.Environment = v
+			case "types":
+				d.Types = nil
+			case "tags":
+				d.Tags = nil
+			case "infos":
+				d.Infos = nil
+			case "storage":
+				d.Storage = nil
+			}
+
+		}
+	}
+}

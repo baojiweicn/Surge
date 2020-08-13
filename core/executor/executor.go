@@ -20,7 +20,5 @@ var (
 )
 
 // Executor : is the exector for a language command executor
-type Executor struct {
-	langType LangType
-	env      *Environment
+type Executor interface {
 }

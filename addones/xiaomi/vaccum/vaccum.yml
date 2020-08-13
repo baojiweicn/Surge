@@ -1,0 +1,60 @@
+device:
+    name: xiaomi_vaccum
+    environment: python
+    types: 
+        - vaccum 
+        - device 
+    tags: 
+        - vaccum
+        - test 
+    infos:
+        status:  
+            - unknown
+            - home
+            - start 
+            - back
+        power: integer
+        position:
+            x-position: integer
+            y-position: integer
+    storage:
+        ip: string
+        token: string
+        next: datetime
+
+actions:
+    scan:
+        executor: scan.py
+        params:
+            ip: string
+        message: scan_result 
+    info:
+        executor: info.py
+        message: info
+    start:
+        executor: start.py
+        message: info
+    home:
+        executor: home.py
+        message: info
+    move:
+        executor: move.py
+        params:
+            x: integer
+            y: integer
+        message: info
+
+messages:
+    info:
+        power: integer
+        location:
+            x-position: integer
+            y-position: integer
+        status:
+            - unknown
+            - home
+            - start 
+            - back
+    scan_result:
+        ip: string
+        token: string
