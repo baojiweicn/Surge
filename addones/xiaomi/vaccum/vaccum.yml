@@ -8,15 +8,9 @@ device:
         - vaccum
         - test 
     infos:
-        status:  
-            - unknown
-            - home
-            - start 
-            - back
+        status: status
         power: integer
-        position:
-            x-position: integer
-            y-position: integer
+        position: position
     storage:
         ip: string
         token: string
@@ -40,21 +34,22 @@ actions:
     move:
         executor: move.py
         params:
-            x: integer
-            y: integer
+            position: position
         message: info
 
-messages:
+objects:
     info:
         power: integer
-        location:
-            x-position: integer
-            y-position: integer
-        status:
-            - unknown
-            - home
-            - start 
-            - back
+        location: position
+        status: status
     scan_result:
         ip: string
         token: string
+    status:
+        unknown: 0 
+        home: 1 
+        start: 2 
+        back: 3 
+    position:
+        x-position: interger
+        y-position: interger

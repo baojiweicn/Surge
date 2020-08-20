@@ -1,4 +1,4 @@
-package vendor
+package device
 
 import (
 	"io/ioutil"
