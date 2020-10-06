@@ -1,0 +1,20 @@
+- name: xiaomi
+  type: vaccum
+  actions:
+    - name: scan 
+      python: "scan.py -c {{ device }}" 
+
+    - name: goto
+      python: "gotopy -c {{ position }}"
+
+    - name: info
+      python: "goto py "
+
+    - name: start
+      python: "goto py"
+
+    - name: home
+      python: "go home"
+    
+    - name: move
+      python: "move"
